@@ -30,4 +30,4 @@ Directory Tree is organised as follows
 License
 -------
 
-[GPLv3](./LICENSE)
+[GPLv3](./LICENCE)
