@@ -15,12 +15,7 @@ Running
 
 This is a standalone python script that will run on any system with the **python-matplotlib** package. This is inlcuded in most GNU/Linux distributions.
 
-To generate the default graphs under *./images/* just run: 
-
----
-python src/parser.py
----
-
+To generate the default graphs under **./images/** just run: `python src/parser.py`
 
 Directory Tree is organised as follows
 --------------------------------------
