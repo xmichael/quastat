@@ -102,9 +102,9 @@ if __name__ == "__main__":
     (names,ras,ds,zs,lons,lats, fis, thetas) =  parse("./data/quasars.all.csv")
     #assert names,ras... have same len()
 
-    #scatterplot(lons,lats,"Longitude","Latitude", './images/astroLatLon.png')
-    #scatterplot(thetas,fis,"Theta","Phi", './images/PhiTheta_xwrisProsimo.png')
-    #hist(zs,5000,"Redshift", "Quasars", "./images/Zhist.png")
+    scatterplot(lons,lats,"Longitude","Latitude", './images/astroLatLon.png')
+    scatterplot(thetas,fis,"Theta","Phi", './images/PhiTheta_xwrisProsimo.png')
+    hist(zs,5000,"Redshift", "Quasars", "./images/Zhist.png")
 
     for i in (names,ras,ds,zs,lons,lats, fis, thetas):
         print "First fields: %s" %  `i[0]`
@@ -123,15 +123,15 @@ if __name__ == "__main__":
             sys.exit(1)
         phi2.append(  phi )
     
-    #scatterplot(thetas, phi2,"Theta","Phi", './images/PhiThetaKafrila.png')
+    scatterplot(thetas, phi2,"Theta","Phi", './images/PhiThetaKafrila.png')
 
     #downsample:
     #xy = downample(thetas, phi2, 10000)
     #scatterplot(xy[0], xy[1],"Theta","Phi", './images/PhiThetaKafrila_sample.png')
     
     #3D lat,lon,Z
-    #scat3d(thetas,phi2,zs,"Theta","Phi","Z",'./images/ThetaPhiZ_3d.png')
+    scat3d(thetas,phi2,zs,"Theta","Phi","Z",'./images/ThetaPhiZ_3d.png')
 
-    # color with Z
+    # color with Z me random downsample 15000 giati alliws kalyptoun ta panta kai den ksexwrizeis tipota
     (x,y,z) = downsample(thetas, phi2, zs, 15000)
     scatterplot(x,y,"Theta","Phi", './images/PhiThetaKafrilaColor.png',cvar=z)
