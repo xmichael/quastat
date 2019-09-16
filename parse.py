@@ -48,8 +48,8 @@ def parse(fname):
                 lons.append(float(l[5]))
                 lats.append(float(l[6]))
         except Exception as e:
-            print "Parse Error -- " + e.message
-            print "Cuprit line was at " + `linenum` + " -- " + `l`
+            print("Parse Error -- ", e.message)
+            print("Cuprit line was at ", str(linenum), " -- ", str(l))
         return (names, ras, ds, zs, lons, lats, fis, thetas)
 
 
@@ -58,7 +58,7 @@ def scatterplot(x, y, xlabel, ylabel, outfile, cvar=None):
     pylab.ylabel(ylabel)
     pylab.xlim([min(x), max(x)])
     pylab.ylim([min(y), max(y)])
-    if cvar != None:
+    if cvar is not None:
         # there is a 3rd color variable (Normally Redshift)
         cmap = cl.LinearSegmentedColormap.from_list("BlRd", ["blue", "red"])
         #cmap =  pylab.cm.get_cmap('RdBu')
@@ -101,7 +101,7 @@ def downsample(x, y, z, size):
     """
     data = np.core.records.fromarrays([x, y, z])
     np.random.shuffle(data)
-    #print `data["f0"][:10]`
+    # print(repr(data["f0"][:10]))
 
     return (data["f0"][:size], data["f1"][:size], data["f2"][:size])
 
@@ -117,19 +117,19 @@ if __name__ == "__main__":
     hist(zs, 5000, "Redshift", "Quasars", "./images/Zhist.png")
 
     for i in (names, ras, ds, zs, lons, lats, fis, thetas):
-        print "First fields: %s" % `i[0]`
-        print "len of field: %d" % len(i)
+        print("First fields: %s" % repr(i[0]))
+        print("len of field: %d" % len(i))
 
     # kafrocalculation
     phi2 = []
-    for i in xrange(len(ds)):
+    for i in range(len(ds)):
         d = ds[i]
         if d[0] >= 0:
             phi = d[0] + d[1] / 60.0 + d[2] / 3600.0
         elif d[0] < 0:
             phi = d[0] - d[1] / 60.0 - d[2] / 3600.0
         else:
-            print "ERROR"
+            print("ERROR")
             sys.exit(1)
         phi2.append(phi)
 
