@@ -11,9 +11,36 @@ import mpl_toolkits.mplot3d.axes3d as p3
 import matplotlib.colors as cl
 
 
+def ra2theta(ra):
+    """ Convert Right Ascention to Θ
+
+    :param Array d: Declination as array[3] in degrees,mins,seconds
+    :return: Returns float Θ
+    """
+    theta = (ra[0] + ra[1] / 60.0 + ra[2] / 3600.0) * 180.0 / 12.0
+    return theta
+
+
+def d2phi(d):
+    """ Convert Declination to Φ
+
+    :param Array d: Declination as array[3] of Hours, Minutes, Seconds
+    :return: Returns float Φ
+    """
+    if d[0] >= 0:
+        phi = d[0] + d[1] / 60.0 + d[2] / 3600.0
+    elif d[0] < 0:
+        phi = d[0] - d[1] / 60.0 - d[2] / 3600.0
+    else:
+        print("d2phi conversion error")
+        sys.exit(1)
+    return phi
+
+
 def parse(fname):
-    """ Parse Verocat CSV file and return a list of arrays as [names..], [Ras...], [Ds...],
-    [Zs..], [Lons..], [Lats..], [Φs..], [Θs..] """
+    """ Parse Verocat CSV file and return a list of arrays as
+    [names..], [Ras...], [Ds...], [Zs..], [Lons..], [Lats..], [Φs..], [Θs..]
+    """
     (names, ras, ds, zs, lons, lats, fis, thetas) = (
         [], [], [], [], [], [], [], [])
     linenum = 0
@@ -40,9 +67,8 @@ def parse(fname):
                 ds.append(d)
 
                 # My calculation of RAs and Ds to degrees φ,θ:
-                thetas.append(
-                    (ra[0] + ra[1] / 60.0 + ra[2] / 3600.0) * 180.0 / 12.0)
-                fis.append(d[0] + d[1] / 60.0 + d[2] / 3600.0)
+                thetas.append(ra2theta(ra))
+                fis.append(d2phi(d))
 
                 zs.append(float(l[4]))
                 lons.append(float(l[5]))
@@ -61,7 +87,7 @@ def scatterplot(x, y, xlabel, ylabel, outfile, cvar=None):
     if cvar is not None:
         # there is a 3rd color variable (Normally Redshift)
         cmap = cl.LinearSegmentedColormap.from_list("BlRd", ["blue", "red"])
-        #cmap =  pylab.cm.get_cmap('RdBu')
+        # cmap =  pylab.cm.get_cmap('RdBu')
         norm = pylab.Normalize(min(cvar), max(cvar))
         pylab.scatter(x, y, marker='.', c=cvar, norm=norm, cmap=cmap)
         # create the colorbar
@@ -72,7 +98,7 @@ def scatterplot(x, y, xlabel, ylabel, outfile, cvar=None):
     else:
         pylab.scatter(x, y, marker='.', s=0.001)
     pylab.savefig(outfile, dpi=(600))
-#    pylab.show()
+    # pylab.show()
     pylab.close()
 
 
@@ -107,42 +133,29 @@ def downsample(x, y, z, size):
 
 
 if __name__ == "__main__":
-    (names, ras, ds, zs, lons, lats, fis, thetas) = parse("./data/quasars.all.csv")
-    # assert names,ras... have same len()
+    (names, ras, ds, zs, lons, lats, fis, thetas) = \
+        parse("./data/quasars.all.csv")
 
     scatterplot(lons, lats, "Longitude", "Latitude",
                 './images/astroLatLon.png')
     scatterplot(thetas, fis, "Theta", "Phi",
-                './images/PhiTheta_xwrisProsimo.png')
+                './images/PhiTheta.png')
     hist(zs, 5000, "Redshift", "Quasars", "./images/Zhist.png")
 
+    # assert names,ras... have same len()
     for i in (names, ras, ds, zs, lons, lats, fis, thetas):
         print("First fields: %s" % repr(i[0]))
         print("len of field: %d" % len(i))
 
-    # kafrocalculation
-    phi2 = []
-    for i in range(len(ds)):
-        d = ds[i]
-        if d[0] >= 0:
-            phi = d[0] + d[1] / 60.0 + d[2] / 3600.0
-        elif d[0] < 0:
-            phi = d[0] - d[1] / 60.0 - d[2] / 3600.0
-        else:
-            print("ERROR")
-            sys.exit(1)
-        phi2.append(phi)
-
-    scatterplot(thetas, phi2, "Theta", "Phi", './images/PhiThetaKafrila.png')
-
     # downsample:
-    #xy = downample(thetas, phi2, 10000)
-    #scatterplot(xy[0], xy[1],"Theta","Phi", './images/PhiThetaKafrila_sample.png')
+    # xy = downample(thetas, phi2, 10000)
+    # scatterplot(xy[0], xy[1],"Theta","Phi", './images/PhiTheta_sample.png')
 
     # 3D lat,lon,Z
-    scat3d(thetas, phi2, zs, "Theta", "Phi", "Z", './images/ThetaPhiZ_3d.png')
+    scat3d(thetas, fis, zs, "Theta", "Phi", "Z", './images/ThetaPhiZ_3d.png')
 
-    # color with Z me random downsample 15000 giati alliws kalyptoun ta panta kai den ksexwrizeis tipota
-    (x, y, z) = downsample(thetas, phi2, zs, 15000)
+    # color with Z me random downsample 15000 giati alliws kalyptoun ta panta
+    # kai den ksexwrizeis tipota
+    (x, y, z) = downsample(thetas, fis, zs, 15000)
     scatterplot(x, y, "Theta", "Phi",
                 './images/PhiThetaKafrilaColor.png', cvar=z)
