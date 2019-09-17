@@ -132,9 +132,51 @@ def downsample(x, y, z, size):
     return (data["f0"][:size], data["f1"][:size], data["f2"][:size])
 
 
-if __name__ == "__main__":
-    (names, ras, ds, zs, lons, lats, fis, thetas) = \
+def error_margin(a, b, m):
+    if (abs(a - b) < m):
+        return True
+    return False
+
+
+def print_row(data, i):
+    """Print ith 0-based index of data"""
+    for col in data:
+        print(col[i], end=' ')
+    print()
+
+
+def find_opposite(data):
+    """ assumes all columns in data[col1,col2..] have equal length
+        :return: subset of data
+    """
+    # import ipdb
+    # ipdb.set_trace()
+    n = len(data[0])
+    print("Total is: ", n)
+    for i in range(n):
+        if((i % 100) == 0):
+            print(i)
+        for j in range(n):
+            phi_1 = data[6][i]
+            theta_1 = data[7][i]
+            z_1 = data[3][i]
+            phi_2 = data[6][j]
+            theta_2 = data[7][j]
+            z_2 = data[3][j]
+            if error_margin(phi_1, -phi_2, 0.1) and \
+                error_margin(theta_1, 180 + theta_2, 0.1) and \
+                    error_margin(z_1, z_2, 0.1):
+                print_row(data, i)
+                print_row(data, j)
+                print()
+
+
+def main():
+    (names, ras, ds, zs, lons, lats, fis, thetas) = data =\
         parse("./data/quasars.all.csv")
+
+    find_opposite(data)
+    sys.exit(0)
 
     scatterplot(lons, lats, "Longitude", "Latitude",
                 './images/astroLatLon.png')
@@ -159,3 +201,7 @@ if __name__ == "__main__":
     (x, y, z) = downsample(thetas, fis, zs, 15000)
     scatterplot(x, y, "Theta", "Phi",
                 './images/PhiThetaKafrilaColor.png', cvar=z)
+
+
+if __name__ == "__main__":
+    main()
